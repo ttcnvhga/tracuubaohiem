@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tra Cứu Mã Bệnh – Danh Mục Bệnh Dài Ngày BHXH</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --card: #1a2236;
+    --border: #253048;
+    --accent: #00d4ff;
+    --accent2: #00ff9d;
+    --danger: #ff4d6d;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --green-glow: 0 0 20px rgba(0,255,157,0.25);
+    --blue-glow: 0 0 20px rgba(0,212,255,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    box-shadow: var(--blue-glow);
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 0.6rem;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Search box */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  #searchInput {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 1.05rem;
+    padding: 1rem 1rem 1rem 3rem;
+    border-radius: 12px;
+    outline: none;
+    letter-spacing: 0.08em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+  }
+
+  #searchInput::placeholder {
+    color: var(--muted);
+    text-transform: none;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    letter-spacing: 0;
+    font-size: 0.9rem;
+  }
+
+  #searchInput:focus {
+    border-color: var(--accent);
+    box-shadow: var(--blue-glow);
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: none;
+    padding: 0.2rem;
+    transition: color 0.2s;
+  }
+
+  .clear-btn:hover { color: var(--text); }
+
+  /* Hint */
+  .hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    text-align: center;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  .hint code {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent2);
+    background: rgba(0,255,157,0.08);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  /* Result panel */
+  #result {
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .result-card.found {
+    border-color: var(--accent2);
+    box-shadow: var(--green-glow);
+  }
+
+  .result-card.not-found {
+    border-color: var(--danger);
+    box-shadow: 0 0 20px rgba(255,77,109,0.2);
+  }
+
+  .result-card.found::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+  }
+
+  .result-card.not-found::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--danger);
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .status-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .found .status-icon { background: rgba(0,255,157,0.12); }
+  .not-found .status-icon { background: rgba(255,77,109,0.12); }
+
+  .status-text h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+  }
+
+  .found .status-text h2 { color: var(--accent2); }
+  .not-found .status-text h2 { color: var(--danger); }
+
+  .status-text p {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .disease-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .disease-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .icd-code {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .disease-info { flex: 1; }
+
+  .disease-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+  }
+
+  .disease-cat {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .stt-num {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Stats bar */
+  .stats {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .stat-item {
+    flex: 1;
+    min-width: 120px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.2rem;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  /* Browse section */
+  .section-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 0.85rem;
+    font-family: 'Space Mono', monospace;
+    animation: fadeUp 0.6s 0.25s ease both;
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .cat-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.8rem;
+  }
+
+  .cat-btn:hover {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  .cat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Full list */
+  #fullList { display: none; }
+
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .back-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  .list-cat-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent2);
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 2.5rem;
+    color: var(--muted);
+  }
+
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .empty-state p { font-size: 0.85rem; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.8;
+    animation: fadeUp 0.6s 0.35s ease both;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .searching { animation: pulse 1s infinite; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .category-grid { grid-template-columns: 1fr 1fr; }
+    .stats { gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">TT 46/2016/TT-BYT · Bộ Y Tế</div>
+    <h1>Tra Cứu Mã Bệnh<br>Hưởng Bảo Hiểm Xã Hội</h1>
+    <p class="subtitle">Danh mục bệnh cần chữa trị dài ngày theo Thông tư 46/2016/TT-BYT ngày 30/12/2016</p>
+  </header>
+
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Nhập mã bệnh ICD-10 (VD: K74, B18.1, G40…)" autocomplete="off" spellcheck="false">
+    <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+  </div>
+
+  <p class="hint">Hỗ trợ tra cứu theo mã 3 ký tự (<code>K74</code>) và mã 4 ký tự (<code>K74.3</code>). Mã 4 ký tự thuộc nhóm mã 3 ký tự sẽ được hưởng chế độ.</p>
+
+  <div class="stats" id="statsBar">
+    <div class="stat-item">
+      <div class="stat-num" id="totalCount">332</div>
+      <div class="stat-label">Bệnh trong danh mục</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">17</div>
+      <div class="stat-label">Nhóm chuyên khoa</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="searchCount" style="color:var(--accent2);">—</div>
+      <div class="stat-label">Kết quả tra cứu</div>
+    </div>
+  </div>
+
+  <div id="result"></div>
+
+  <!-- Browse by category -->
+  <div id="browseSection">
+    <p class="section-title">// Duyệt theo chuyên khoa</p>
+    <div class="category-grid" id="catGrid"></div>
+  </div>
+
+  <!-- Full list for a category -->
+  <div id="fullList">
+    <div class="list-header">
+      <span class="list-cat-title" id="listCatTitle"></span>
+      <button class="back-btn" onclick="closeCatList()">← Quay lại</button>
+    </div>
+    <div id="listContent"></div>
+  </div>
+
+  <footer>
+    Dữ liệu theo <strong>Thông tư số 46/2016/TT-BYT</strong> ngày 30 tháng 12 năm 2016 của Bộ trưởng Bộ Y tế<br>
+    Hiệu lực từ ngày <strong>01/03/2017</strong> · Chỉ mang tính tham khảo, vui lòng xác nhận với cơ quan BHXH
+  </footer>
+
+</div>
+
+<script>
+// =============================================
+// DATA: All 332 diseases from TT 46/2016/TT-BYT
+// =============================================
+const categories = [
+  { roman: 'I', name: 'Bệnh nhiễm trùng và ký sinh trùng' },
+  { roman: 'II', name: 'Bướu tân sinh (Neoplasm)' },
+  { roman: 'III', name: 'Bệnh của máu, cơ quan tạo máu và các rối loạn liên quan đến cơ chế miễn dịch' },
+  { roman: 'IV', name: 'Bệnh nội tiết, dinh dưỡng và chuyển hóa' },
+  { roman: 'V', name: 'Bệnh tâm thần' },
+  { roman: 'VI', name: 'Bệnh hệ thần kinh' },
+  { roman: 'VII', name: 'Bệnh mắt và phần phụ của mắt' },
+  { roman: 'VIII', name: 'Bệnh lý tai mũi họng' },
+  { roman: 'IX', name: 'Bệnh hệ tuần hoàn' },
+  { roman: 'X', name: 'Bệnh hệ hô hấp' },
+  { roman: 'XI', name: 'Bệnh hệ tiêu hóa' },
+  { roman: 'XII', name: 'Bệnh da và mô dưới da' },
+  { roman: 'XIII', name: 'Bệnh hệ cơ - xương - khớp và mô liên kết' },
+  { roman: 'XIV', name: 'Bệnh hệ sinh dục - Tiết niệu' },
+  { roman: 'XV', name: 'Thai nghén, sinh đẻ và hậu sản' },
+  { roman: 'XVI', name: 'Vết thương ngộ độc và hậu quả của một số nguyên nhân bên ngoài' },
+  { roman: 'XVII', name: 'Các yếu tố ảnh hưởng đến tình trạng sức khỏe và tiếp xúc dịch vụ y tế' },
+];
+
+const diseases = [
+  // I - Nhiễm trùng và ký sinh trùng
+  { stt:1, cat:'I', name:'Nhiễm Amip dai dẳng (ở ruột và gan)', codes:['A06'] },
+  { stt:2, cat:'I', name:'Tiêu chảy kéo dài', codes:['A09'] },
+  { stt:3, cat:'I', name:'Bệnh lao các loại trong giai đoạn điều trị và di chứng', codes:['A15','A16','A17','A18','A19'] },
+  { stt:4, cat:'I', name:'Bệnh do trực khuẩn lao không điển hình NTM', codes:['A15.3'] },
+  { stt:5, cat:'I', name:'Bệnh Withmore', codes:['A24.4'] },
+  { stt:6, cat:'I', name:'Bệnh nhiễm Brucella', codes:['A23'] },
+  { stt:7, cat:'I', name:'Uốn ván nặng và di chứng', codes:['A35'] },
+  { stt:8, cat:'I', name:'Bệnh phong (bệnh Hansen) và di chứng', codes:['A30','B92'] },
+  { stt:9, cat:'I', name:'Di chứng do lao xương và khớp', codes:['B90.2'] },
+  { stt:10, cat:'I', name:'Viêm gan vi rút B mạn tính', codes:['B18.1'] },
+  { stt:11, cat:'I', name:'Viêm gan vi rút C mạn tính', codes:['B18.2'] },
+  { stt:12, cat:'I', name:'Viêm gan vi rút D mạn tính', codes:['B18.8'] },
+  { stt:13, cat:'I', name:'Viêm gan E mãn tính', codes:['B18.8'] },
+  { stt:14, cat:'I', name:'Bệnh nhiễm vi rút suy giảm miễn dịch ở người HIV/AIDS', codes:['B20','B21','B22','B23','B24','Z21'] },
+  { stt:15, cat:'I', name:'Di chứng viêm não, màng não do vi khuẩn, virus, ký sinh trùng', codes:['B94.1','B94.8','B94.9'] },
+  { stt:16, cat:'I', name:'Viêm màng não do nấm (candida, cryptococcus)', codes:['B37.5','B45.1'] },
+  { stt:17, cat:'I', name:'Bệnh phổi do nấm', codes:['B38','B39','B40','B41','B42','B43','B44','B45','B46'] },
+  { stt:18, cat:'I', name:'Nhiễm nấm Cryptococcus', codes:['B45'] },
+  { stt:19, cat:'I', name:'Nhiễm nấm penicillium marneffei', codes:['B48.4'] },
+  { stt:20, cat:'I', name:'Sốt rét do Plasmodium Falciparum thể não', codes:['B50.0'] },
+  { stt:21, cat:'I', name:'Sốt rét do Plasmodium Falciparum thể nặng và biến chứng', codes:['B50.8'] },
+  { stt:22, cat:'I', name:'Nhiễm xoắn trùng sán lợn ở não', codes:['B70'] },
+  { stt:23, cat:'I', name:'Nhiễm giun xoắn', codes:['B75'] },
+  { stt:24, cat:'I', name:'Nhiễm sán lá gan nhỏ', codes:['B66.1'] },
+  { stt:25, cat:'I', name:'Nhiễm sán lá gan lớn', codes:['B66.3'] },
+  { stt:26, cat:'I', name:'Nhiễm ký sinh trùng (Toxocara, Cysticerose, Stronglyloides,…)', codes:['B89'] },
+  { stt:27, cat:'I', name:'Nhiễm trùng do vi khuẩn đa kháng thuốc', codes:[] },
+  { stt:28, cat:'I', name:'Viêm màng não do Streptococcus suis', codes:['G00.2'] },
+  { stt:29, cat:'I', name:'Viêm nội tâm mạc nhiễm khuẩn', codes:['I33'] },
+  { stt:30, cat:'I', name:'Viêm xoang', codes:['J32'] },
+  { stt:31, cat:'I', name:'Viêm gan do rượu', codes:['K70.5'] },
+  { stt:32, cat:'I', name:'Viêm khớp do lao', codes:['M01.1'] },
+  { stt:33, cat:'I', name:'Lao cột sống', codes:['M49.0'] },
+  { stt:34, cat:'I', name:'Viêm đường tiết niệu tái phát', codes:['N00'] },
+  // II - Bướu tân sinh
+  { stt:35, cat:'II', name:'Bệnh ung thư các loại', codes:['C00','C01','C02','C03','C04','C05','C06','C07','C08','C09','C10','C11','C12','C13','C14','C15','C16','C17','C18','C19','C20','C21','C22','C23','C24','C25','C26','C30','C31','C32','C33','C34','C37','C38','C39','C40','C41','C43','C44','C45','C46','C47','C48','C49','C50','C51','C52','C53','C54','C55','C56','C57','C58','C60','C61','C62','C63','C64','C65','C66','C67','C68','C69','C70','C71','C72','C73','C74','C75','C76','C77','C78','C79','C80','C81','C82','C83','C84','C85','C88','C90','C91','C92','C93','C94','C95','C96','C97','D00','D01','D02','D03','D04','D05','D06','D07','D08','D09'] },
+  { stt:36, cat:'II', name:'U xương lành tính có tiêu hủy xương', codes:['D16'] },
+  { stt:37, cat:'II', name:'U tuyến thượng thận', codes:['D35.0'] },
+  { stt:38, cat:'II', name:'U không tiên lượng được tiến triển và tính chất', codes:['D37','D38','D39','D40','D41','D42','D43','D44','D45','D46','D47','D48'] },
+  // III - Máu và cơ quan tạo máu
+  { stt:39, cat:'III', name:'Bệnh Thalassemia', codes:['D56'] },
+  { stt:40, cat:'III', name:'Bệnh hồng cầu hình liềm', codes:['D57'] },
+  { stt:41, cat:'III', name:'Các thiếu máu tan máu di truyền', codes:['D58'] },
+  { stt:42, cat:'III', name:'Thiếu máu tan máu mắc phải', codes:['D59'] },
+  { stt:43, cat:'III', name:'Đái huyết sắc tố kịch phát ban đêm (Hội chứng Marchiafava)', codes:['D59.5'] },
+  { stt:44, cat:'III', name:'Suy tủy xương một dòng hồng cầu mắc phải / Các thể suy tủy xương khác', codes:['D60','D61'] },
+  { stt:45, cat:'III', name:'Thiếu yếu tố VIII di truyền (Hemophilia A)', codes:['D66'] },
+  { stt:46, cat:'III', name:'Thiếu yếu tố IX di truyền (Hemophilia B)', codes:['D67'] },
+  { stt:47, cat:'III', name:'Bệnh Von Willebrand', codes:['D68.0'] },
+  { stt:48, cat:'III', name:'Thiếu các yếu tố XI di truyền', codes:['D68.1'] },
+  { stt:49, cat:'III', name:'Thiếu các yếu tố đông máu khác do di truyền', codes:['D68.2'] },
+  { stt:50, cat:'III', name:'Các rối loạn đông máu đặc biệt khác', codes:['D68.8'] },
+  { stt:51, cat:'III', name:'Bất thường chất lượng tiểu cầu', codes:['D69.1'] },
+  { stt:52, cat:'III', name:'Ban xuất huyết giảm tiểu cầu vô căn', codes:['D69.3'] },
+  { stt:53, cat:'III', name:'Tăng tiểu cầu tiên phát', codes:['D75.2'] },
+  { stt:54, cat:'III', name:'Hội chứng thực bào tế bào máu liên quan đến nhiễm trùng', codes:['D76.2'] },
+  { stt:55, cat:'III', name:'Bệnh Sarcoidosis', codes:['D86'] },
+  { stt:56, cat:'III', name:'Tăng Gammaglobulin máu không đặc hiệu', codes:['D89.2'] },
+  // IV - Nội tiết
+  { stt:57, cat:'IV', name:'Suy tuyến giáp', codes:['E03'] },
+  { stt:58, cat:'IV', name:'Nhiễm độc giáp', codes:['E05'] },
+  { stt:59, cat:'IV', name:'Viêm tuyến giáp mạn tính', codes:['E06.2','E06.3','E06.4'] },
+  { stt:60, cat:'IV', name:'Bệnh suy tuyến cận giáp', codes:['E20.8'] },
+  { stt:61, cat:'IV', name:'Đái tháo đường', codes:['E10','E11','E12','E13','E14'] },
+  { stt:62, cat:'IV', name:'Hạ đường huyết nghi do cường Insulin', codes:['E16.1'] },
+  { stt:63, cat:'IV', name:'Cường cận giáp và các rối loạn khác của tuyến cận giáp', codes:['E21'] },
+  { stt:64, cat:'IV', name:'Cường tuyến yên', codes:['E22'] },
+  { stt:65, cat:'IV', name:'Bệnh đái tháo nhạt', codes:['E23.2'] },
+  { stt:66, cat:'IV', name:'Hội chứng Cushing', codes:['E24'] },
+  { stt:67, cat:'IV', name:'Tăng Aldosteron', codes:['E26'] },
+  { stt:68, cat:'IV', name:'Bệnh Bartter', codes:['E26.8'] },
+  { stt:69, cat:'IV', name:'Các rối loạn của tuyến thượng thận', codes:['E27'] },
+  { stt:70, cat:'IV', name:'Rối loạn chức năng đa tuyến', codes:['E31'] },
+  { stt:71, cat:'IV', name:'Bệnh Wilson', codes:['E83.0'] },
+  { stt:72, cat:'IV', name:'Chuyển hóa - Giảm Kali máu', codes:['E87.6'] },
+  { stt:73, cat:'IV', name:'Suy giáp sau điều trị', codes:['E89.0'] },
+  { stt:74, cat:'IV', name:'Đái tháo đường thai kỳ (nguy cơ dọa xảy thai, thai lưu nhiều lần)', codes:['O24'] },
+  // V - Tâm thần
+  { stt:75, cat:'V', name:'Mất trí trong bệnh Alzheimer', codes:['F00'] },
+  { stt:76, cat:'V', name:'Mất trí tuệ trong các bệnh lý khác', codes:['F02'] },
+  { stt:77, cat:'V', name:'Mất trí tuệ không biệt định', codes:['F03'] },
+  { stt:78, cat:'V', name:'Hội chứng quên thực tổn không do rượu và chất tác động tâm thần khác', codes:['F04'] },
+  { stt:79, cat:'V', name:'Rối loạn tâm thần do tổn thương, rối loạn chức năng não và bệnh lý cơ thể', codes:['F06'] },
+  { stt:80, cat:'V', name:'Các rối loạn nhân cách và hành vi do bệnh não', codes:['F07'] },
+  { stt:81, cat:'V', name:'Các rối loạn tâm thần và hành vi do rượu', codes:['F10'] },
+  { stt:82, cat:'V', name:'Tâm thần phân liệt', codes:['F20'] },
+  { stt:83, cat:'V', name:'Rối loạn loại phân liệt', codes:['F21'] },
+  { stt:84, cat:'V', name:'Rối loạn hoang tưởng dai dẳng', codes:['F22'] },
+  { stt:85, cat:'V', name:'Rối loạn phân liệt cảm xúc', codes:['F25'] },
+  { stt:86, cat:'V', name:'Rối loạn cảm xúc lưỡng cực', codes:['F31'] },
+  { stt:87, cat:'V', name:'Giai đoạn trầm cảm', codes:['F32'] },
+  { stt:88, cat:'V', name:'Rối loạn trầm cảm tái diễn', codes:['F33'] },
+  { stt:89, cat:'V', name:'Các trạng thái rối loạn khí sắc', codes:['F34'] },
+  { stt:90, cat:'V', name:'Các rối loạn lo âu ám ảnh sợ hãi', codes:['F40'] },
+  { stt:91, cat:'V', name:'Các rối loạn lo âu khác', codes:['F41'] },
+  { stt:92, cat:'V', name:'Rối loạn ám ảnh nghi thức', codes:['F42'] },
+  { stt:93, cat:'V', name:'Rối loạn stress sau sang chấn', codes:['F43.1'] },
+  { stt:94, cat:'V', name:'Các rối loạn sự thích ứng', codes:['F43.2'] },
+  { stt:95, cat:'V', name:'Các rối loạn dạng cơ thể', codes:['F45'] },
+  { stt:96, cat:'V', name:'Các rối loạn nhân cách đặc hiệu', codes:['F60'] },
+  { stt:97, cat:'V', name:'Các rối loạn nhân cách hỗn hợp và các rối loạn nhân cách khác', codes:['F61'] },
+  { stt:98, cat:'V', name:'Các biến đổi nhân cách lâu dài không thể gán cho một tổn thương não hoặc bệnh não', codes:['F62'] },
+  { stt:99, cat:'V', name:'Các rối loạn khác về hành vi và nhân cách ở người thành niên', codes:['F68'] },
+  { stt:100, cat:'V', name:'Chậm phát triển tâm thần', codes:['F70','F71','F72','F73','F74','F75','F76','F77','F78','F79'] },
+  { stt:101, cat:'V', name:'Các rối loạn về phát triển tâm lý', codes:['F80','F81','F82','F83','F84','F85','F86','F87','F88','F89'] },
+  { stt:102, cat:'V', name:'Các rối loạn hành vi và cảm xúc thường khởi phát ở tuổi trẻ em và thanh thiếu niên', codes:['F90','F91','F92','F93','F94','F95','F96','F97','F98'] },
+  // VI - Thần kinh
+  { stt:103, cat:'VI', name:'Sa sút trí tuệ trong bệnh mạch máu', codes:['F01'] },
+  { stt:104, cat:'VI', name:'Bệnh xơ cứng cột bên teo cơ', codes:['G13'] },
+  { stt:105, cat:'VI', name:'Bệnh Parkinson', codes:['G20'] },
+  { stt:106, cat:'VI', name:'Hội chứng Parkinson thứ phát', codes:['G21'] },
+  { stt:107, cat:'VI', name:'Loạn trương lực cơ (Dystonia)', codes:['G24'] },
+  { stt:108, cat:'VI', name:'Bệnh Alzheimer', codes:['G30'] },
+  { stt:109, cat:'VI', name:'Xơ cứng rải rác (Multiple Sclerosis)', codes:['G35'] },
+  { stt:110, cat:'VI', name:'Viêm tủy hoại tử bán cấp', codes:['G37.4'] },
+  { stt:111, cat:'VI', name:'Động kinh', codes:['G40'] },
+  { stt:112, cat:'VI', name:'Bệnh nhược cơ', codes:['G70.0'] },
+  { stt:113, cat:'VI', name:'Viêm não viêm tủy và viêm não tủy', codes:['G04'] },
+  { stt:114, cat:'VI', name:'Di chứng của bệnh viêm hệ thần kinh trung ương', codes:['G09'] },
+  { stt:115, cat:'VI', name:'Teo cơ do tủy sống và hội chứng liên quan (bao gồm bệnh nơ ron vận động)', codes:['G12'] },
+  { stt:116, cat:'VI', name:'Viêm tủy thị thần kinh', codes:['G36.0'] },
+  { stt:117, cat:'VI', name:'Viêm tủy cắt ngang', codes:['G37.3'] },
+  { stt:118, cat:'VI', name:'Đau dây thần kinh tam thoa (dây thần kinh số V)', codes:['G50.0'] },
+  { stt:119, cat:'VI', name:'Co thắt giật cơ, múa giật', codes:['G51.3'] },
+  { stt:120, cat:'VI', name:'Đau dây thần kinh sau zona', codes:['G53.0'] },
+  { stt:121, cat:'VI', name:'Các tổn thương đám rối thần kinh cánh tay', codes:['G54'] },
+  { stt:122, cat:'VI', name:'Hội chứng Guillain-Barré (viêm đa rễ đa dây thần kinh)', codes:['G61.0'] },
+  { stt:123, cat:'VI', name:'Bệnh nhiều dây thần kinh do viêm (mãn tính)', codes:['G61'] },
+  { stt:124, cat:'VI', name:'Bệnh cơ tiên phát', codes:['G71'] },
+  { stt:125, cat:'VI', name:'Bệnh cơ khác', codes:['G72'] },
+  { stt:126, cat:'VI', name:'Bại não trẻ em', codes:['G80'] },
+  { stt:127, cat:'VI', name:'Liệt 2 chân hoặc liệt tứ chi', codes:['G82'] },
+  { stt:128, cat:'VI', name:'Bệnh khác của tủy sống', codes:['G95'] },
+  { stt:129, cat:'VI', name:'Xuất huyết não', codes:['I61'] },
+  { stt:130, cat:'VI', name:'Nhồi máu não', codes:['I63'] },
+  { stt:131, cat:'VI', name:'Đột quỵ không rõ nhồi máu não hay xuất huyết não', codes:['I64'] },
+  { stt:132, cat:'VI', name:'Di chứng bệnh mạch máu não', codes:['I69'] },
+  { stt:133, cat:'VI', name:'Não úng thủy', codes:['Q03'] },
+  { stt:134, cat:'VI', name:'Neuroblastomas', codes:[] },
+  { stt:135, cat:'VI', name:'Hội chứng Down', codes:['Q90'] },
+  { stt:136, cat:'VI', name:'Hội chứng Edward và hội chứng Pateau', codes:['Q91'] },
+  // VII - Mắt
+  { stt:137, cat:'VII', name:'Hội chứng khô mắt', codes:['H04.1','H04.2'] },
+  { stt:138, cat:'VII', name:'Viêm loét giác mạc', codes:['H16'] },
+  { stt:139, cat:'VII', name:'Viêm màng bồ đào trước', codes:['H20.2'] },
+  { stt:140, cat:'VII', name:'Bệnh co mi mắt', codes:['H21'] },
+  { stt:141, cat:'VII', name:'Hội chứng Harada', codes:['H30.8'] },
+  { stt:142, cat:'VII', name:'Viêm màng bồ đào (sau, toàn bộ)', codes:['H30.9'] },
+  { stt:143, cat:'VII', name:'Bệnh dịch kính võng mạc tăng sinh', codes:['H33.4'] },
+  { stt:144, cat:'VII', name:'Tắc mạch máu trung tâm võng mạc', codes:['H34.8'] },
+  { stt:145, cat:'VII', name:'Bệnh võng mạc đái tháo đường', codes:['H35'] },
+  { stt:146, cat:'VII', name:'Bệnh viêm võng mạc do CMV', codes:['H35'] },
+  { stt:147, cat:'VII', name:'Viêm mạch máu võng mạc', codes:['H35.0'] },
+  { stt:148, cat:'VII', name:'Bệnh lý võng mạc trẻ sinh non', codes:['H35.1'] },
+  { stt:149, cat:'VII', name:'Bệnh hắc võng mạc trung tâm thanh dịch', codes:['H35.7'] },
+  { stt:150, cat:'VII', name:'Bệnh lý võng mạc do xơ vữa động mạch', codes:['H36.6'] },
+  { stt:151, cat:'VII', name:'Bệnh Glôcôm', codes:['H40'] },
+  { stt:152, cat:'VII', name:'Nhãn viêm giao cảm', codes:['H44.1'] },
+  { stt:153, cat:'VII', name:'Viêm gai thị', codes:['H46.2'] },
+  { stt:154, cat:'VII', name:'Viêm thị thần kinh hậu nhãn cầu', codes:['H46.3'] },
+  { stt:155, cat:'VII', name:'Bệnh lí bề mặt nhãn cầu do hội chứng Steve Johnson, hội chứng Lyell', codes:[] },
+  { stt:156, cat:'VII', name:'Đã ghép giác mạc', codes:['Z94.7'] },
+  // VIII - Tai mũi họng
+  { stt:157, cat:'VIII', name:'Khối u dây VII', codes:['D43.3'] },
+  { stt:158, cat:'VIII', name:'Khối u dây VIII', codes:['D43.3'] },
+  { stt:159, cat:'VIII', name:'Sarcoidosis tai', codes:['D86'] },
+  { stt:160, cat:'VIII', name:'Papilome thanh quản', codes:['B97.7'] },
+  { stt:161, cat:'VIII', name:'Viêm tai giữa mạn tính', codes:['H66.3'] },
+  { stt:162, cat:'VIII', name:'Viêm tai xương chũm có biến chứng', codes:['H70.9'] },
+  { stt:163, cat:'VIII', name:'Cholesteatoma đỉnh xương đá', codes:['H71'] },
+  { stt:164, cat:'VIII', name:'Bệnh Meniere', codes:['H81.0'] },
+  { stt:165, cat:'VIII', name:'Điếc nghề nghiệp', codes:['H83.3'] },
+  { stt:166, cat:'VIII', name:'Điếc tiến triển', codes:['H90.5'] },
+  { stt:167, cat:'VIII', name:'Các dị tật ở tai gây ảnh hưởng tới thính lực', codes:['H90.0'] },
+  { stt:168, cat:'VIII', name:'Điếc tiếp nhận sau chấn thương xương thái dương', codes:['H91.8'] },
+  { stt:169, cat:'VIII', name:'Viêm họng mạn tính', codes:['K21'] },
+  { stt:170, cat:'VIII', name:'Viêm mũi xoang mạn tính', codes:['J32'] },
+  { stt:171, cat:'VIII', name:'Thoát vị não, màng não vào tai - xương chũm', codes:['Q01'] },
+  { stt:172, cat:'VIII', name:'Sẹo hẹp khí quản', codes:['Q32.4'] },
+  { stt:173, cat:'VIII', name:'Hội chứng Tumer', codes:['Q96.9'] },
+  { stt:174, cat:'VIII', name:'Chấn thương thanh khí quản', codes:['S27.5','S11.9'] },
+  // IX - Tuần hoàn
+  { stt:175, cat:'IX', name:'Hội chứng mạch vành cấp', codes:['I20','I21','I22','I23'] },
+  { stt:176, cat:'IX', name:'Bệnh tim do thiếu máu cục bộ mạn', codes:['I25'] },
+  { stt:177, cat:'IX', name:'Tắc mạch phổi', codes:['I26'] },
+  { stt:178, cat:'IX', name:'Các bệnh tim do phổi khác', codes:['I27'] },
+  { stt:179, cat:'IX', name:'Viêm màng ngoài tim cấp', codes:['I30'] },
+  { stt:180, cat:'IX', name:'Viêm co thắt màng ngoài tim mạn', codes:['I31.1'] },
+  { stt:181, cat:'IX', name:'Viêm cơ tim', codes:['I40'] },
+  { stt:182, cat:'IX', name:'Viêm nội tâm mạc nhiễm trùng', codes:['I33','I38'] },
+  { stt:183, cat:'IX', name:'Suy tim độ 3-4 do các nguyên nhân khác nhau', codes:['I50'] },
+  { stt:184, cat:'IX', name:'Phình động mạch, lóc tách động mạch', codes:['I71'] },
+  { stt:185, cat:'IX', name:'Viêm tắc động mạch', codes:['I74'] },
+  { stt:186, cat:'IX', name:'Viêm tắc tĩnh mạch', codes:['I80'] },
+  { stt:187, cat:'IX', name:'Biến chứng sau phẫu thuật hoặc can thiệp tim mạch', codes:['I97'] },
+  { stt:188, cat:'IX', name:'Tăng huyết áp có biến chứng', codes:['I10'] },
+  { stt:189, cat:'IX', name:'Bệnh cơ tim: Cơ tim giãn; Cơ tim hạn chế; Cơ tim phì đại; Bệnh cơ tim khác', codes:['I42'] },
+  { stt:190, cat:'IX', name:'Tăng huyết áp có biến chứng khác (Bệnh não, TBMMN thoáng qua) có tổn thương cơ quan đích', codes:['I10'] },
+  { stt:191, cat:'IX', name:'Bệnh tim bẩm sinh có biến chứng Tăng áp lực động mạch phổi tiên phát', codes:['Q20','Q21','Q22'] },
+  { stt:192, cat:'IX', name:'Bệnh van tim có biến chứng (Rối loạn nhịp tim, tắc mạch, nhiễm trùng, khác)', codes:['I08','I34','I35'] },
+  { stt:193, cat:'IX', name:'Rung nhĩ mãn tính có biến chứng', codes:['I48'] },
+  { stt:194, cat:'IX', name:'Rối loạn nhịp tim có biến chứng (Hội chứng nút xoang bệnh, block nhĩ thất)', codes:['I49'] },
+  { stt:195, cat:'IX', name:'Thông động tĩnh mạch phổi', codes:['Q25.7','Q26'] },
+  { stt:196, cat:'IX', name:'Bất thường động mạch phổi bẩm sinh', codes:['Q25.7'] },
+  // X - Hô hấp
+  { stt:197, cat:'X', name:'Viêm thanh quản mạn', codes:['J37.0'] },
+  { stt:198, cat:'X', name:'Políp của dây thanh âm và thanh quản', codes:['J38.1'] },
+  { stt:199, cat:'X', name:'Bệnh phổi tắc nghẽn mạn tính', codes:['J44'] },
+  { stt:200, cat:'X', name:'Hen phế quản', codes:['J45'] },
+  { stt:201, cat:'X', name:'Giãn phế quản', codes:['J47'] },
+  { stt:202, cat:'X', name:'Bệnh bụi phổi than', codes:['J60'] },
+  { stt:203, cat:'X', name:'Bệnh bụi phổi amian', codes:['J61'] },
+  { stt:204, cat:'X', name:'Bệnh bụi phổi silic', codes:['J62'] },
+  { stt:205, cat:'X', name:'Bệnh bụi phổi do bụi vô cơ khác', codes:['J63'] },
+  { stt:206, cat:'X', name:'Bệnh bụi phổi do bụi không xác định', codes:['J64'] },
+  { stt:207, cat:'X', name:'Các bệnh phổi mô kẽ khác', codes:['J84'] },
+  { stt:208, cat:'X', name:'Áp xe phổi và trung thất', codes:['J85'] },
+  { stt:209, cat:'X', name:'Mủ màng phổi mạn tính', codes:['J86'] },
+  { stt:210, cat:'X', name:'Suy hô hấp mạn (Dị dạng lồng ngực)', codes:['J96','J96.1'] },
+  { stt:211, cat:'X', name:'Kén khí phổi', codes:['J94.0'] },
+  { stt:212, cat:'X', name:'Cystic Fibrosis (xơ nang phổi)', codes:['E84'] },
+  { stt:213, cat:'X', name:'Tăng áp động mạch phổi vô căn', codes:[] },
+  // XI - Tiêu hóa
+  { stt:214, cat:'XI', name:'Viêm gan mạn tính tiến triển', codes:['K73'] },
+  { stt:215, cat:'XI', name:'Xơ gan hóa và xơ gan', codes:['K74'] },
+  { stt:216, cat:'XI', name:'Viêm gan tự miễn', codes:['K75.4'] },
+  { stt:217, cat:'XI', name:'Viêm đường mật mạn', codes:['K80.3'] },
+  { stt:218, cat:'XI', name:'Viêm tụy mạn', codes:['K86.0','K86.1'] },
+  { stt:219, cat:'XI', name:'Bệnh Crohn', codes:['K50'] },
+  { stt:220, cat:'XI', name:'Xơ gan ứ mật nguyên phát', codes:['K74.3'] },
+  { stt:221, cat:'XI', name:'Viêm loét đại trực tràng chảy máu', codes:['K52'] },
+  { stt:222, cat:'XI', name:'Wilson', codes:[] },
+  { stt:223, cat:'XI', name:'Viêm tụy tự miễn', codes:[] },
+  // XII - Da
+  { stt:224, cat:'XII', name:'Pemphigus', codes:['L10'] },
+  { stt:225, cat:'XII', name:'Bọng nước dạng Pemphigus', codes:['L12'] },
+  { stt:226, cat:'XII', name:'Bệnh Duhring Brocq', codes:['L13.0'] },
+  { stt:227, cat:'XII', name:'Ly thượng bì bọng nước bẩm sinh', codes:['L14'] },
+  { stt:228, cat:'XII', name:'Viêm da cơ địa', codes:['L20','L30'] },
+  { stt:229, cat:'XII', name:'Viêm da tróc vảy / Đỏ da toàn thân', codes:['L26'] },
+  { stt:230, cat:'XII', name:'Vảy nến', codes:['L40'] },
+  { stt:231, cat:'XII', name:'Vảy phấn đỏ nang lông', codes:['L44.0'] },
+  { stt:232, cat:'XII', name:'Hồng ban nút', codes:['L52'] },
+  { stt:233, cat:'XII', name:'Viêm da mủ hoại thư', codes:['L88'] },
+  { stt:234, cat:'XII', name:'Loét mạn tính da', codes:['L98.4'] },
+  { stt:235, cat:'XII', name:'Bệnh Á vẩy nến (các thể)', codes:['L41','L41.0','L41.1','L41.3','L41.4','L41.5','L41.8'] },
+  { stt:236, cat:'XII', name:'Mày đay mạn tính', codes:['L50'] },
+  // XIII - Cơ xương khớp
+  { stt:237, cat:'XIII', name:'Lupus ban đỏ hệ thống', codes:['M32'] },
+  { stt:238, cat:'XIII', name:'Viêm khớp phản ứng', codes:['M02.8','M02.9'] },
+  { stt:239, cat:'XIII', name:'Viêm khớp dạng thấp', codes:['M05'] },
+  { stt:240, cat:'XIII', name:'Viêm khớp vảy nến và viêm khớp trong bệnh lý ruột', codes:['M07.3'] },
+  { stt:241, cat:'XIII', name:'Bệnh Gút', codes:['M10'] },
+  { stt:242, cat:'XIII', name:'Các bệnh khớp do vi tinh thể', codes:['M11'] },
+  { stt:243, cat:'XIII', name:'Thoái hoá khớp háng', codes:['M16'] },
+  { stt:244, cat:'XIII', name:'Thoái hoá khớp gối', codes:['M17'] },
+  { stt:245, cat:'XIII', name:'Viêm quanh nút động mạch và các bệnh lý liên quan', codes:['M30'] },
+  { stt:246, cat:'XIII', name:'Bệnh lý mạch hoại tử khác', codes:['M31'] },
+  { stt:247, cat:'XIII', name:'Viêm đa cơ và viêm da cơ', codes:['M33'] },
+  { stt:248, cat:'XIII', name:'Xơ cứng bì toàn thể', codes:['M34'] },
+  { stt:249, cat:'XIII', name:'Hội chứng khô (Sjogren\'s syndrome)', codes:['M35.0'] },
+  { stt:250, cat:'XIII', name:'Trượt đốt sống', codes:['M43'] },
+  { stt:251, cat:'XIII', name:'Viêm cột sống dính khớp', codes:['M45'] },
+  { stt:252, cat:'XIII', name:'Thoái hóa cột sống', codes:['M47'] },
+  { stt:253, cat:'XIII', name:'Bệnh đĩa đệm cột sống cổ', codes:['M50'] },
+  { stt:254, cat:'XIII', name:'Viêm quanh khớp vai thể đông cứng', codes:['M75.0'] },
+  { stt:255, cat:'XIII', name:'Loãng xương có gãy xương bệnh lý', codes:['M80'] },
+  { stt:256, cat:'XIII', name:'Gãy xương không liền (khớp giả)', codes:['M84.1'] },
+  { stt:257, cat:'XIII', name:'Gãy xương bệnh lý', codes:['M84.4'] },
+  { stt:258, cat:'XIII', name:'Loạn sản xơ xương', codes:['M85.0'] },
+  { stt:259, cat:'XIII', name:'Cốt tuỷ viêm (viêm xương - tủy xương)', codes:['M86'] },
+  { stt:260, cat:'XIII', name:'Hoại tử xương vô khuẩn tự phát', codes:['M87.0'] },
+  { stt:261, cat:'XIII', name:'Hội chứng đau vùng phức hợp (Loạn dưỡng giao cảm phản xạ)', codes:['M89.0'] },
+  { stt:262, cat:'XIII', name:'Gãy xương trong bệnh khối U', codes:['M90.7'] },
+  { stt:263, cat:'XIII', name:'Các biến dạng mắc phải của hệ cơ xương khớp và mô liên kết', codes:['M95'] },
+  { stt:264, cat:'XIII', name:'Viêm khớp mủ', codes:['M00'] },
+  { stt:265, cat:'XIII', name:'Bệnh lý khớp phản ứng và sau nhiễm trùng tiến triển thành mãn tính', codes:['M03'] },
+  { stt:266, cat:'XIII', name:'Viêm khớp dạng thấp RF (-)', codes:['M06'] },
+  { stt:267, cat:'XIII', name:'Bệnh Still người lớn', codes:['M06.1'] },
+  { stt:268, cat:'XIII', name:'Viêm khớp thiếu niên', codes:['M08'] },
+  { stt:269, cat:'XIII', name:'Viêm khớp thiếu niên ở những bệnh đã được phân loại khác', codes:['M09'] },
+  { stt:270, cat:'XIII', name:'Viêm khớp khác', codes:['M13'] },
+  { stt:271, cat:'XIII', name:'Thoái hóa nhiều khớp', codes:['M15'] },
+  { stt:272, cat:'XIII', name:'Thoái hóa khớp bàn ngón tay', codes:['M18'] },
+  { stt:273, cat:'XIII', name:'Thoái hóa khớp khác', codes:['M19'] },
+  { stt:274, cat:'XIII', name:'Bệnh khớp đặc hiệu khác', codes:['M24'] },
+  { stt:275, cat:'XIII', name:'Bệnh lý khác của tổ chức liên kết', codes:['M35'] },
+  { stt:276, cat:'XIII', name:'Bệnh của tổ chức liên kết trong các bệnh lý khác', codes:['M36'] },
+  { stt:277, cat:'XIII', name:'Bệnh lý cột sống ở những bệnh đã được phân loại khác', codes:['M49'] },
+  { stt:278, cat:'XIII', name:'Bệnh lý đĩa đệm khác', codes:['M51'] },
+  { stt:279, cat:'XIII', name:'Bệnh lý cột sống không được phân loại khác', codes:['M53'] },
+  { stt:280, cat:'XIII', name:'Đau cột sống', codes:['M54'] },
+  { stt:281, cat:'XIII', name:'Viêm cơ', codes:['M60'] },
+  { stt:282, cat:'XIII', name:'Canxi và cốt hóa của cơ', codes:['M61'] },
+  { stt:283, cat:'XIII', name:'Viêm màng hoạt dịch và viêm gân', codes:['M65'] },
+  { stt:284, cat:'XIII', name:'Bệnh lý khớp vai', codes:['M75'] },
+  { stt:285, cat:'XIII', name:'Viêm tổ chức mỡ dưới da không đặc hiệu', codes:['M79.3'] },
+  { stt:286, cat:'XIII', name:'Đau xơ cơ', codes:['M79.7'] },
+  { stt:287, cat:'XIII', name:'Loãng xương không gãy xương bệnh lý', codes:['M81'] },
+  { stt:288, cat:'XIII', name:'Loãng xương trong các bệnh lý khác', codes:['M82'] },
+  { stt:289, cat:'XIII', name:'Nhuyễn xương người lớn', codes:['M83'] },
+  { stt:290, cat:'XIII', name:'Bệnh Paget', codes:['M88'] },
+  // XIV - Sinh dục tiết niệu
+  { stt:291, cat:'XIV', name:'Viêm thận lupus', codes:['N01'] },
+  { stt:292, cat:'XIV', name:'Tiểu máu dai dẳng và tái phát', codes:['N02'] },
+  { stt:293, cat:'XIV', name:'Hội chứng viêm thận mạn', codes:['N03'] },
+  { stt:294, cat:'XIV', name:'Hội chứng thận hư', codes:['N04'] },
+  { stt:295, cat:'XIV', name:'Các bệnh cầu thận mạn do nguyên nhân nguyên phát và thứ phát', codes:['N08'] },
+  { stt:296, cat:'XIV', name:'Viêm ống kẽ thận mạn tính', codes:['N11'] },
+  { stt:297, cat:'XIV', name:'Suy thận mạn', codes:['N18'] },
+  { stt:298, cat:'XIV', name:'Viêm bàng quang mạn tính', codes:['N30'] },
+  { stt:299, cat:'XIV', name:'Tiểu không tự chủ', codes:['N39.3','N39.4'] },
+  { stt:300, cat:'XIV', name:'Rò bàng quang - sinh dục nữ', codes:['N82'] },
+  { stt:301, cat:'XIV', name:'Dị tật lỗ tiểu thấp', codes:['Q54'] },
+  // XV - Thai nghén
+  { stt:302, cat:'XV', name:'Chửa trứng', codes:['O01'] },
+  { stt:303, cat:'XV', name:'Biến chứng sau xảy thai, chửa trứng, chửa ngoài tử cung', codes:['O08'] },
+  { stt:304, cat:'XV', name:'Tiền sản giật thể trung bình', codes:['O14.0'] },
+  { stt:305, cat:'XV', name:'Tiền sản giật thể nặng', codes:['O14.1'] },
+  { stt:306, cat:'XV', name:'Rỉ ối có điều trị để làm chậm chuyển dạ', codes:['O42.2'] },
+  { stt:307, cat:'XV', name:'Rau cài răng lược', codes:['O43.2'] },
+  { stt:308, cat:'XV', name:'Rau tiền đạo trung tâm', codes:['O44'] },
+  // XVI - Vết thương ngộ độc
+  { stt:309, cat:'XVI', name:'Chấn thương tủy sống có di chứng hoặc biến chứng', codes:['S34'] },
+  { stt:310, cat:'XVI', name:'Chấn thương cột sống có di chứng hoặc biến chứng', codes:['S12','S14','S22.0','S32.0'] },
+  { stt:311, cat:'XVI', name:'Chấn thương sọ não có di chứng hoặc biến chứng', codes:['S06'] },
+  { stt:312, cat:'XVI', name:'Tổn thương nội sọ có di chứng hoặc biến chứng', codes:['S06'] },
+  { stt:313, cat:'XVI', name:'Tổn thương đám rối thần kinh cánh tay', codes:['S14.3'] },
+  { stt:314, cat:'XVI', name:'Tổn thương dây chằng chéo gối sau phẫu thuật', codes:['S83.5'] },
+  { stt:315, cat:'XVI', name:'Di chứng do phẫu thuật và tai biến điều trị', codes:[] },
+  { stt:316, cat:'XVI', name:'Di chứng do vết thương chiến tranh', codes:[] },
+  { stt:317, cat:'XVI', name:'Bỏng đường hô hấp', codes:['T27'] },
+  { stt:318, cat:'XVI', name:'Bỏng nhiều vùng cơ thể', codes:['T29'] },
+  { stt:319, cat:'XVI', name:'Bỏng tổn thương 30-39% bề mặt cơ thể', codes:['T31.3'] },
+  { stt:320, cat:'XVI', name:'Bỏng tổn thương 40-49% bề mặt cơ thể', codes:['T31.4'] },
+  { stt:321, cat:'XVI', name:'Bỏng tổn thương 50-59% bề mặt cơ thể', codes:['T31.5'] },
+  { stt:322, cat:'XVI', name:'Bỏng tổn thương 60-69% bề mặt cơ thể', codes:['T31.6'] },
+  { stt:323, cat:'XVI', name:'Bỏng tổn thương 70-79% bề mặt cơ thể', codes:['T31.7'] },
+  { stt:324, cat:'XVI', name:'Bỏng tổn thương 80-89% bề mặt cơ thể', codes:['T31.8'] },
+  { stt:325, cat:'XVI', name:'Bỏng tổn thương 90% hoặc hơn, bề mặt cơ thể', codes:['T31.9'] },
+  { stt:326, cat:'XVI', name:'Di chứng bỏng', codes:['T95'] },
+  // XVII - Yếu tố sức khỏe
+  { stt:327, cat:'XVII', name:'Ghép giác mạc', codes:['T86.8'] },
+  { stt:328, cat:'XVII', name:'Các lỗ mở của đường tiêu hóa', codes:['Z43.4'] },
+  { stt:329, cat:'XVII', name:'Các lỗ mở của đường tiết niệu', codes:['Z43.6'] },
+  { stt:330, cat:'XVII', name:'Thay khớp háng', codes:['Z69.6'] },
+  { stt:331, cat:'XVII', name:'Thay khớp gối', codes:['Z69.6'] },
+  { stt:332, cat:'XVII', name:'Ghép tạng và điều trị sau ghép tạng', codes:['Z94'] },
+];
+
+// =============================================
+// LOOKUP LOGIC
+// =============================================
+function normalizeCode(code) {
+  return code.toUpperCase().trim();
+}
+
+function getParentCode(code) {
+  // K74.3 -> K74
+  const parts = code.split('.');
+  if (parts.length > 1) return parts[0];
+  return null;
+}
+
+function search(query) {
+  const q = normalizeCode(query);
+  if (!q) return [];
+  const results = [];
+  
+  for (const d of diseases) {
+    let match = false;
+    for (const c of d.codes) {
+      const cn = normalizeCode(c);
+      // Exact match
+      if (cn === q) { match = true; break; }
+      // Range match: e.g. query A16 matches A15 đến A19 range
+      // Parent match: query K74.3 matches K74
+      if (cn === q) { match = true; break; }
+      // Check if query is a child of this code (e.g. K74.3 for K74)
+      if (q.startsWith(cn + '.') || q.startsWith(cn)) {
+        // Make sure it's a real prefix not just coincidence
+        if (q.length > cn.length && (q[cn.length] === '.' || isNaN(q[cn.length]) === false)) {
+          match = true; break;
+        }
+      }
+      // Check if this code is a child of query (e.g. query K74, code K74.3)
+      if (cn.startsWith(q + '.')) { match = true; break; }
+    }
+    
+    // Range match: handle "A15 đến A19" style
+    if (!match) {
+      for (const c of d.codes) {
+        const cn = normalizeCode(c);
+        // Simple range: only letter + numbers (e.g. A15-A19)
+        // We stored them individually, so this already works
+      }
+    }
+    
+    if (match) results.push(d);
+  }
+  return results;
+}
+
+function getCategoryName(roman) {
+  const cat = categories.find(c => c.roman === roman);
+  return cat ? cat.name : '';
+}
+
+// =============================================
+// UI
+// =============================================
+const input = document.getElementById('searchInput');
+const resultEl = document.getElementById('result');
+const clearBtn = document.getElementById('clearBtn');
+const searchCountEl = document.getElementById('searchCount');
+const browseSection = document.getElementById('browseSection');
+const fullList = document.getElementById('fullList');
+
+let debounceTimer;
+
+input.addEventListener('input', () => {
+  clearBtn.style.display = input.value ? 'block' : 'none';
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => doSearch(input.value), 200);
+});
+
+function clearSearch() {
+  input.value = '';
+  clearBtn.style.display = 'none';
+  resultEl.innerHTML = '';
+  searchCountEl.textContent = '—';
+  input.focus();
+}
+
+function doSearch(q) {
+  const v = q.trim();
+  if (!v) {
+    resultEl.innerHTML = '';
+    searchCountEl.textContent = '—';
+    return;
+  }
+  
+  const matches = search(v);
+  searchCountEl.textContent = matches.length;
+  
+  if (matches.length === 0) {
+    resultEl.innerHTML = `
+      <div class="result-card not-found" style="animation: fadeUp 0.3s ease both;">
+        <div class="status-row">
+          <div class="status-icon">✗</div>
+          <div class="status-text">
+            <h2>Không có trong danh mục</h2>
+            <p>Mã bệnh <strong style="color:var(--text)">${v.toUpperCase()}</strong> không thuộc danh mục bệnh cần chữa trị dài ngày</p>
+          </div>
+        </div>
+        <div class="empty-state" style="padding: 1rem 0 0;">
+          <p style="font-size:0.8rem;">Vui lòng kiểm tra lại mã bệnh hoặc liên hệ cơ quan BHXH để được hướng dẫn cụ thể.</p>
+        </div>
+      </div>`;
+    return;
+  }
+  
+  const listHtml = matches.map(d => {
+    const catName = getCategoryName(d.cat);
+    const codesDisplay = d.codes.length ? d.codes.join(', ') : 'Theo tên chẩn đoán';
+    return `
+      <div class="disease-item">
+        <div class="icd-code">${codesDisplay}</div>
+        <div class="disease-info">
+          <div class="disease-name">${d.name}</div>
+          <div class="disease-cat">Nhóm ${d.cat} · ${catName} · STT ${d.stt}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  resultEl.innerHTML = `
+    <div class="result-card found" style="animation: fadeUp 0.3s ease both;">
+      <div class="status-row">
+        <div class="status-icon">✓</div>
+        <div class="status-text">
+          <h2>Có trong danh mục – Được hưởng chế độ</h2>
+          <p>Tìm thấy <strong style="color:var(--text)">${matches.length}</strong> bệnh khớp với mã <strong style="color:var(--text)">${v.toUpperCase()}</strong></p>
+        </div>
+      </div>
+      <div class="disease-list">${listHtml}</div>
+    </div>`;
+}
+
+// =============================================
+// CATEGORY BROWSER
+// =============================================
+function buildCatGrid() {
+  const grid = document.getElementById('catGrid');
+  const icons = ['🦠','🔬','🩸','⚗️','🧠','🧬','👁️','👂','❤️','🫁','🫀','🩹','🦴','💊','🤰','🚑','🏥'];
+  categories.forEach((cat, i) => {
+    const count = diseases.filter(d => d.cat === cat.roman).length;
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn';
+    btn.innerHTML = `<span>${icons[i]||'📋'}</span><span style="flex:1;line-height:1.35">${cat.name}</span><span class="cat-num">${count}</span>`;
+    btn.onclick = () => showCatList(cat.roman, cat.name);
+    grid.appendChild(btn);
+  });
+}
+
+function showCatList(roman, name) {
+  browseSection.style.display = 'none';
+  fullList.style.display = 'block';
+  document.getElementById('listCatTitle').textContent = `Nhóm ${roman} – ${name}`;
+  const items = diseases.filter(d => d.cat === roman);
+  const html = items.map(d => {
+    const codesDisplay = d.codes.length ? d.codes.join(', ') : 'Theo tên chẩn đoán';
+    return `<div class="disease-item">
+      <div class="icd-code">${codesDisplay}</div>
+      <div class="disease-info">
+        <div class="disease-name">${d.name}</div>
+        <div class="disease-cat">STT ${d.stt}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('listContent').innerHTML = `<div class="disease-list">${html}</div>`;
+  window.scrollTo({top: document.getElementById('fullList').offsetTop - 80, behavior:'smooth'});
+}
+
+function closeCatList() {
+  fullList.style.display = 'none';
+  browseSection.style.display = 'block';
+  window.scrollTo({top: browseSection.offsetTop - 80, behavior:'smooth'});
+}
+
+// Init
+buildCatGrid();
+document.getElementById('totalCount').textContent = diseases.length;
+</script>
+</body>
+</html>
